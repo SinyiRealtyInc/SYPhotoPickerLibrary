@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SYPhotoPickerVC" customModule="SYPhotoPickerLibrary" customModuleProvider="target">
+            <connections>
+                <outlet property="collectionView" destination="W5B-05-8d5" id="6y3-FM-l7j"/>
+                <outlet property="tableContainerView" destination="rH3-95-OC2" id="g8y-PD-Kvk"/>
+                <outlet property="tableView" destination="8oy-xu-S5R" id="5by-FF-Fw2"/>
+                <outlet property="tableViewHeight" destination="0GI-bd-RXa" id="9NC-WX-DXf"/>
+                <outlet property="view" destination="7KI-sp-81l" id="yHc-HZ-pye"/>
+            </connections>
+        </placeholder>
+        <view contentMode="scaleToFill" id="7KI-sp-81l">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="W5B-05-8d5">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="yUf-NL-7SI">
+                        <size key="itemSize" width="100" height="100"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <cells/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="BFl-sp-U1e"/>
+                        <outlet property="delegate" destination="-1" id="QDW-fa-rR9"/>
+                    </connections>
+                </collectionView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rH3-95-OC2">
+                    <rect key="frame" x="0.0" y="44" width="414" height="200"/>
+                    <subviews>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="8oy-xu-S5R">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="200"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <connections>
+                                <outlet property="dataSource" destination="-1" id="Plf-CI-Esa"/>
+                                <outlet property="delegate" destination="-1" id="Hos-Pr-rk5"/>
+                            </connections>
+                        </tableView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="200" id="0GI-bd-RXa"/>
+                        <constraint firstItem="8oy-xu-S5R" firstAttribute="top" secondItem="rH3-95-OC2" secondAttribute="top" id="Gzk-WD-YhZ"/>
+                        <constraint firstAttribute="bottom" secondItem="8oy-xu-S5R" secondAttribute="bottom" id="LRj-tD-Rib"/>
+                        <constraint firstItem="8oy-xu-S5R" firstAttribute="leading" secondItem="rH3-95-OC2" secondAttribute="leading" id="ZQr-hX-5oa"/>
+                        <constraint firstAttribute="trailing" secondItem="8oy-xu-S5R" secondAttribute="trailing" id="nhY-fC-QxN"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="U9k-af-7qp"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="U9k-af-7qp" firstAttribute="trailing" secondItem="rH3-95-OC2" secondAttribute="trailing" id="7xk-40-jpg"/>
+                <constraint firstItem="W5B-05-8d5" firstAttribute="leading" secondItem="U9k-af-7qp" secondAttribute="leading" id="Gud-8A-Y2N"/>
+                <constraint firstItem="U9k-af-7qp" firstAttribute="bottom" secondItem="W5B-05-8d5" secondAttribute="bottom" id="hSb-Vn-9KW"/>
+                <constraint firstItem="rH3-95-OC2" firstAttribute="leading" secondItem="U9k-af-7qp" secondAttribute="leading" id="knc-ji-jfT"/>
+                <constraint firstItem="U9k-af-7qp" firstAttribute="trailing" secondItem="W5B-05-8d5" secondAttribute="trailing" id="nL2-Hw-kDg"/>
+                <constraint firstItem="W5B-05-8d5" firstAttribute="top" secondItem="U9k-af-7qp" secondAttribute="top" id="qG2-7l-ya2"/>
+                <constraint firstItem="rH3-95-OC2" firstAttribute="top" secondItem="U9k-af-7qp" secondAttribute="top" id="vMz-Ue-kAx"/>
+            </constraints>
+            <point key="canvasLocation" x="375" y="-577"/>
+        </view>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

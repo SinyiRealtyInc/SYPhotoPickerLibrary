@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic-close-white.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
