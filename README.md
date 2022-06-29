@@ -26,7 +26,7 @@ dependencies: [
 
 ### 1. Open ur Info.plist and add the following permissions
 
-![Photo Permission](https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary/blob/main/Resources/lib-img-0.png)
+![Photo Permission](https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary/blob/main/Resource/lib-img-0.png)
 
 ```xml
 <key>NSCameraUsageDescription</key>
@@ -77,7 +77,7 @@ picker.show(currentVC: self)
 
 ### 3. SYPhotPicker Attributes
 
-![SYPhotPicker Attributes](https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary/blob/main/Resources/lib-img-1.png)
+![SYPhotPicker Attributes](https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary/blob/main/Resource/lib-img-1.png)
 
 ### 4. Extension SYPhotoPickerDelegate
 
