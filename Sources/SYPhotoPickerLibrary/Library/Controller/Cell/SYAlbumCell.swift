@@ -7,33 +7,26 @@
 
 import UIKit
 
+/// 相簿挑選清單 Cell
 class SYAlbumCell: UITableViewCell {
 
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var countLabel: UILabel!
     
-    private var pickerSettings: SYPhotoPickerSetting?
+    /// 資料集(AlbumFolder, SYPhotoPickerSetting)
+    var values: (folder: AlbumFolder?,
+                 setting: SYPhotoPickerSetting) = (nil, SYPhotoPickerSetting()) {
+        didSet { setData() }
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
         setupView()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-    
-    func setupData(data: AnyObject) {
-        
-        guard let (data, settings) = data as? (AlbumFolder, SYPhotoPickerSetting?) else { return }
-        setupPhotoPickerSetting(settings: settings)
-        setupTitleLabel(data: data)
-        setupInfoLable(data: data)
-        fetchThumbnail(data: data)
     }
 }
 
@@ -44,53 +37,28 @@ extension SYAlbumCell {
     private func setupView() {
         
         titleLabel.font = .boldSystemFont(ofSize: 17)
-        infoLabel.font = .systemFont(ofSize: 13)
+        countLabel.font = .systemFont(ofSize: 13)
         
         titleLabel.textColor = .black
-        infoLabel.textColor = SYColor.mainBlackLight
+        countLabel.textColor = SYColor.blackLight
     }
     
-    private func updateTitleLabel() {
+    private func setData() {
         
-        guard let setting = pickerSettings else { return }
-        titleLabel.textColor = setting.albumTitleColor
-    }
-    
-    private func fetchThumbnail(data: AlbumFolder) {
+        titleLabel.text = values.folder?.title
+        titleLabel.textColor = values.setting.photoSelectColor
         
-        guard let assest = data.assets.firstObject else { return }
+        countLabel.text = "\(values.folder?.count ?? 0)"
+        
+        guard let assest = values.folder?.assets.firstObject else { return }
+        
         let requestID = SYPhotoPickerHelper.shared.fetchThumbnail(
-            form: assest, requestID: self.tag,
+            form: assest,
+            requestID: tag,
             completion: { [weak self] (image) in
-                self?.setupPhotoImageView(image: image)
+                self?.photoImageView.image = image
         })
-        self.tag = Int(requestID ?? 0)
-    }
-}
-
-// MARK: - Setup Data Private Methods
-
-extension SYAlbumCell {
-
-    private func setupPhotoPickerSetting(settings: SYPhotoPickerSetting?) {
-     
-        guard pickerSettings == nil else { return }
-        pickerSettings = settings
-        updateTitleLabel()
-    }
-    
-    private func setupTitleLabel(data: AlbumFolder) {
         
-        titleLabel.text = data.title
-    }
-    
-    private func setupInfoLable(data: AlbumFolder) {
-        
-        infoLabel.text = "\(data.count)"
-    }
-    
-    private func setupPhotoImageView(image: UIImage) {
-        
-        self.photoImageView.image = image
+        tag = Int(requestID ?? 0)
     }
 }

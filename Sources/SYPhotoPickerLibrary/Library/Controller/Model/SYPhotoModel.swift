@@ -7,17 +7,30 @@
 
 import Photos
 
+/// 照片資料夾
 struct AlbumFolder {
     
-    var title: String
+    /// 資料夾名稱
+    var title: String?
+    
+    /// 照片集
     var assets: PHFetchResult<PHAsset>
-    var count: Int
-    var isSelect: Bool
+    
+    /// 是否被選取
+    var isSelected: Bool = false
+    
+    /// 數量
+    var count: Int { assets.count }
 }
 
+/// 照片資料
 struct AlbumData {
     
-    var assets: PHAsset
-    var isSelect: Bool
-    var selectTitle: String
+    /// PHAsset Model
+    var asset: PHAsset
+    
+    /// 是否被選取
+    var isSelected: Bool = false
+    
+    var selectTitle: String?
 }

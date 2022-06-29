@@ -27,8 +27,12 @@ class SYPhotoPickerHelper {
     
     /// Photo manager object
     private(set) var imageManager: PHCachingImageManager
+    
     private(set) var requestOptions: PHImageRequestOptions
+    
     private(set) var photoThumbnailSize: CGSize = .zero
+    
+    #warning("Cache 待優化")
     private var imageCache: NSCache<AnyObject, UIImage> = NSCache()
     
     private init() {
@@ -43,20 +47,24 @@ class SYPhotoPickerHelper {
         photoThumbnailSize = CGSize(width: 100 * density, height: 100 * density)
         
         guard PHPhotoLibrary.authorizationStatus() == .authorized else { return }
+        
         imageManager.stopCachingImagesForAllAssets()
     }
     
-    func destroy() {
+    deinit {
+        #warning("Cache 待優化")
+        //imageCache.removeAllObjects()
         
-        imageCache.removeAllObjects()
         SYPhotoPickerHelper.weakInstance = nil
     }
     
-    public func setupPhotoThumbnailSize(width: CGFloat) {
+    /// 設定略縮圖的大小
+    /// - Parameter value: 大小, 上限 = 100
+    public func setupPhotoThumbnailSize(value: CGFloat) {
         
         let density = UIScreen.main.scale
-        let value = width <= 100 && width > 0 ? width : 100
-        photoThumbnailSize = CGSize(width: value * density, height: value * density)
+        let result = min(abs(value), 100)
+        photoThumbnailSize = CGSize(width: result * density, height: result * density)
     }
 }
 
@@ -82,25 +90,40 @@ extension SYPhotoPickerHelper {
     static public func requestPermission(didAuthorized: DidAuthorized?,
                                          didLimited: DidLimited?,
                                          didDenied: DidDenied?) {
+        let status = PHPhotoLibrary.authorizationStatus()
         
-        DispatchQueue.main.async {
-            
-            let status = PHPhotoLibrary.authorizationStatus()
-            if #available(iOS 14, *), status == .limited { didLimited?() }
-            if status == .denied || status == .restricted { didDenied?() }
-            if status == .authorized { didAuthorized?() }
-            
-            guard status == .notDetermined else { return }
-            if #available(iOS 14, *) {
-                PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
-                    if status == .authorized { didAuthorized?() }
-                    if status == .limited { didLimited?() }
-                    if status == .denied || status == .restricted { didDenied?() }
+        switch status {
+        case .restricted, .denied:
+            didDenied?()
+            return
+        case .authorized:
+            didAuthorized?()
+            return
+        default:
+            break
+        }
+        
+        if #available(iOS 14, *) {
+            switch status {
+            case .notDetermined:
+                PHPhotoLibrary.requestAuthorization(for: .readWrite) { _ in
+                    DispatchQueue.main.async {
+                        requestPermission(didAuthorized: didAuthorized,
+                                          didLimited: didLimited,
+                                          didDenied: didDenied)
+                    }
                 }
-            } else {
-                PHPhotoLibrary.requestAuthorization { (status) in
-                    if status == .authorized { didAuthorized?() }
-                    if status == .denied || status == .restricted { didDenied?() }
+            case .limited:
+                didLimited?()
+            default:
+                break
+            }
+        } else {
+            PHPhotoLibrary.requestAuthorization { _ in
+                DispatchQueue.main.async {
+                    requestPermission(didAuthorized: didAuthorized,
+                                      didLimited: didLimited,
+                                      didDenied: didDenied)
                 }
             }
         }
@@ -147,11 +170,16 @@ extension SYPhotoPickerHelper {
         var album = [AlbumFolder]()
         data.forEach({ album.append(AlbumFolder(title: $0.collection.localizedTitle ?? "",
                                                 assets: $0.assets,
-                                                count: $0.assets.count,
-                                                isSelect: false)) })
+                                                isSelected: false)) })
         return album
     }
     
+    /// 取得照片略酥酡
+    /// - Parameters:
+    ///   - asset: PHAsset
+    ///   - requestID: 請求識別碼
+    ///   - completion: 完成後回調
+    /// - Returns: PHImageRequestID
     public func fetchThumbnail(form asset: PHAsset,
                                requestID: Int,
                                completion: @escaping (_ image: UIImage) -> Swift.Void) -> PHImageRequestID? {
@@ -160,29 +188,28 @@ extension SYPhotoPickerHelper {
         requestOptions.deliveryMode = .highQualityFormat
         requestOptions.isSynchronous = false
         
-//        if let image = imageCache.object(forKey: asset) {
-//            completion(image)
-//            return nil
-//        }
         if requestID != 0 {
             imageManager.cancelImageRequest(Int32(requestID))
         }
-        let request = imageManager.requestImage(for: asset,
-                                                   targetSize: photoThumbnailSize,
-                                                   contentMode: .aspectFill,
-                                                   options: requestOptions,
-                                                   resultHandler: { (result, info) in
-            guard let image = result else { return }
-            //            self.imageCache.setObject(image, forKey: asset)
-            completion(image)
-        })
-        return request
+        
+        let id = imageManager.requestImage(
+            for: asset,
+            targetSize: photoThumbnailSize,
+            contentMode: .aspectFill,
+            options: requestOptions,
+            resultHandler: { (result, info) in
+                guard let image = result else { return }
+            
+                completion(image)
+            })
+        
+        return id
     }
     
     public func startCacheImage(prefetchItemsAt assets: [PHAsset]) {
         
-        requestOptions.resizeMode = .exact
-        requestOptions.deliveryMode = .highQualityFormat
+        requestOptions.resizeMode = .fast
+        requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
         
         imageManager.startCachingImages(for: assets,
@@ -193,8 +220,8 @@ extension SYPhotoPickerHelper {
     
     public func stopCacheImage(cancelPrefetchingForItemsAt assets: [PHAsset]) {
         
-        requestOptions.resizeMode = .exact
-        requestOptions.deliveryMode = .highQualityFormat
+        requestOptions.resizeMode = .fast
+        requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
         
         imageManager.stopCachingImages(for: assets,

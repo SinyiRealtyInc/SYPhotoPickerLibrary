@@ -11,28 +11,36 @@ import Photos
 
 @objc public protocol SYPhotoPickerDelegate {
     
-    @objc optional func photoPickerDidSelect(asset: PHAsset)
-    @objc optional func photoPickerDidDeselect(asset: PHAsset)
-    @objc optional func photoPickerConfirm(assets: [PHAsset])
-    @objc optional func photoPickerDismiss()
-    @objc optional func photoPickerLimitReached()
+    /// 照片權限被拒
     @objc optional func photoPickerAuthorizedDenied()
+    
+    /// 照片已選取
+    @objc optional func photoPickerDidSelect(asset: PHAsset)
+    
+    /// 照片取消選取
+    @objc optional func photoPickerDidDeselect(asset: PHAsset)
+    
+    /// 選取數量達到上限
+    @objc optional func photoPickerDidLimit()
+    
+    /// 確認所選照片
+    @objc optional func photoPickerConfirm(assets: [PHAsset])
+    
+    /// 關閉照片挑選器
+    @objc optional func photoPickerDismiss()
 }
 
-public class SYPhotoPicker {
+public final class SYPhotoPicker {
+    
+    /// 照片挑選器設定 Model
+    public var settings: SYPhotoPickerSetting
     
     public weak var delegate: SYPhotoPickerDelegate?
-    public var settings: SYPhotoPickerSetting = SYPhotoPickerSetting()
-    private var type: SYPhotoPickerType = .ta
-}
-
-extension SYPhotoPicker {
     
-    public convenience init(type: SYPhotoPickerType) {
+    init(type: SYPhotoPickerType) {
+        settings = SYPhotoPickerSetting()
         
-        self.init()
-        self.type =  type
-        self.setupPhotoPickerSetting(type: type)
+        setupPhotoPickerSetting(type: type)
     }
 }
 
@@ -41,58 +49,60 @@ extension SYPhotoPicker {
 extension SYPhotoPicker {
     
     private func setupPhotoPickerSetting(type: SYPhotoPickerType) {
-        
-        if type == .ta { setupTaSetting() }
-        if type == .im { setupImSetting() }
+        switch type {
+        case .ta:
+            setupTaSetting()
+        case .im:
+            setupImSetting()
+        case .`default`:
+            break
+        }
     }
     
     private func setupTaSetting() {
         
         settings.statusBarStyle = .lightContent
-        settings.barTintColor = SYColor.mainGreen
-        settings.barTextColor = .white
-        settings.leftBarTitle = ""
+        settings.barTintColor = SYColor.green
+        settings.barTitleIconColor = .white
+        settings.leftBarTitle = nil
         settings.rightBarTitle = "確認"
         settings.leftBarImage = SYImage.close.image
         settings.rightBarImage = nil
         settings.limitCount = 21
         settings.numberForRow = 4
-        settings.photoSelectStyle = .string
+        settings.photoSelectStyle = .number
         settings.photoSelectBorderWidth = 2
-        settings.photoSelectColor = SYColor.mainGreen
-        settings.photoPickLocation = .rightTop
-        settings.albumTitleColor = SYColor.mainGreen
+        settings.photoSelectColor = SYColor.green
     }
     
     private func setupImSetting() {
         
         settings.statusBarStyle = .default
         settings.barTintColor = .white
-        settings.barTextColor = SYColor.mainBlack
-        settings.leftBarTitle = ""
+        settings.barTitleIconColor = SYColor.black
+        settings.leftBarTitle = nil
         settings.rightBarTitle = "傳送"
         settings.leftBarImage = SYImage.close.image
         settings.rightBarImage = nil
         settings.limitCount = 10
         settings.numberForRow = 4
-        settings.photoSelectStyle = .symbol
+        settings.photoSelectStyle = .checkbox
         settings.photoSelectBorderWidth = 0
-        settings.photoSelectColor = SYColor.mainGreenDeep
-        settings.photoPickLocation = .rightBottom
-        settings.albumTitleColor = .black
+        settings.photoSelectColor = SYColor.green
     }
     
-    private func showPhotoPicker(currentVC: UIViewController, modalPresentationStyle: UIModalPresentationStyle) {
+    private func showPhotoPicker(currentVC: UIViewController,
+                                 modalPresentationStyle: UIModalPresentationStyle) {
         
-        DispatchQueue.main.async {
-            let photoPickerVC = SYPhotoPickerVC(nibName: "SYPhotoPickerVC", bundle: .module)
-            photoPickerVC.settings = self.settings
-            photoPickerVC.delegate = self.delegate
-            
-            let navigationController = UINavigationController(rootViewController: photoPickerVC)
-            navigationController.modalPresentationStyle = modalPresentationStyle
-            currentVC.present(navigationController, animated: true, completion: nil)
-        }
+        let vc = SYPhotoPickerVC(nibName: "SYPhotoPickerVC", bundle: .module)
+        vc.settings = settings
+        vc.delegate = delegate
+        
+        let nac = SYNavigationController(rootViewController: vc)
+        nac.settings = settings
+        nac.modalPresentationStyle = modalPresentationStyle
+        
+        currentVC.present(nac, animated: true, completion: nil)
     }
 }
 
@@ -100,17 +110,24 @@ extension SYPhotoPicker {
 
 extension SYPhotoPicker {
     
-    public func show(currentVC: UIViewController, modalPresentationStyle: UIModalPresentationStyle = .fullScreen) {
+    /// 顯示照片挑選器頁面
+    /// - Parameters:
+    ///   - currentVC: 當前頁面
+    ///   - presentationStyle: UIModalPresentationStyle
+    public func show(currentVC: UIViewController,
+                     presentationStyle: UIModalPresentationStyle = .fullScreen) {
         
         SYPhotoPickerHelper.requestPermission(
-            didAuthorized: {
-                self.showPhotoPicker(currentVC: currentVC, modalPresentationStyle: modalPresentationStyle)
+            didAuthorized: { [weak self] in
+                self?.showPhotoPicker(currentVC: currentVC,
+                                      modalPresentationStyle: presentationStyle)
             },
-            didLimited: {
-                self.showPhotoPicker(currentVC: currentVC, modalPresentationStyle: modalPresentationStyle)
+            didLimited: { [weak self] in
+                self?.showPhotoPicker(currentVC: currentVC,
+                                      modalPresentationStyle: presentationStyle)
             },
-            didDenied: {
-                self.delegate?.photoPickerAuthorizedDenied?()
+            didDenied: { [weak self] in
+                self?.delegate?.photoPickerAuthorizedDenied?()
             })
     }
 }
