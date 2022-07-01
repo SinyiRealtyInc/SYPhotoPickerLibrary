@@ -37,7 +37,7 @@ public final class SYPhotoPicker {
     
     public weak var delegate: SYPhotoPickerDelegate?
     
-    init(type: SYPhotoPickerType) {
+    public init(type: SYPhotoPickerType) {
         settings = SYPhotoPickerSetting()
         
         setupPhotoPickerSetting(type: type)
