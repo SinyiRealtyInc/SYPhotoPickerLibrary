@@ -44,8 +44,8 @@ On iOS 14 later
 ### 2. Use SYPhotoPickerLibrary. You can building what you want
 
 ```swift
-import SYPhotoPickerLibrary
 import Photos
+import SYPhotoPickerLibrary
 
 /**
   * @param statusBarStyle         : (choose) (default: .lightContent)
@@ -97,7 +97,14 @@ extension ViewController: SYPhotoPickerDelegate {
     func photoPickerDidLimit() {}
     
     /// 確認所挑選照片
-    func photoPickerConfirm(assets: [PHAsset]) {}
+    func photoPickerConfirm(assets: [PHAsset]) {
+        for asset in assets {
+            let size = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+            SYPhotoPickerHelper.shared.fetchImage(form: asset, size: size) { image in
+                // do something...
+            }
+        }
+    }
     
     /// 離開照片挑選器
     func photoPickerDismiss() {}

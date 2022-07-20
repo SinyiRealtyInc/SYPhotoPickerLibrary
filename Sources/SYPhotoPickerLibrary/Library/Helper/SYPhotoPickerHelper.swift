@@ -9,11 +9,11 @@ import UIKit
 import Photos
 
 /// 處理權限、相片讀取幫助類
-class SYPhotoPickerHelper {
+public class SYPhotoPickerHelper {
     
     private static var weakInstance: SYPhotoPickerHelper?
     
-    static var shared: SYPhotoPickerHelper {
+    public static var shared: SYPhotoPickerHelper {
         get {
             if let instance = weakInstance {
                 return instance
@@ -60,7 +60,7 @@ class SYPhotoPickerHelper {
     
     /// 設定略縮圖的大小
     /// - Parameter value: 大小, 上限 = 100
-    public func setupPhotoThumbnailSize(value: CGFloat) {
+    func setupPhotoThumbnailSize(value: CGFloat) {
         
         let density = UIScreen.main.scale
         let result = min(abs(value), 100)
@@ -73,14 +73,14 @@ class SYPhotoPickerHelper {
 extension SYPhotoPickerHelper {
     
     /// 使用者允許讀取相簿 callback
-    typealias DidAuthorized = () -> Swift.Void
+    public typealias DidAuthorized = () -> Swift.Void
     
     
     /// 使用者允許讀取相簿但僅顯示部分照片
-    typealias DidLimited = () -> Swift.Void
+    public typealias DidLimited = () -> Swift.Void
     
     /// 使用者不允許讀取相簿 callback
-    typealias DidDenied = () -> Swift.Void
+    public typealias DidDenied = () -> Swift.Void
     
     /// 請求相簿權限
     /// - Parameters:
@@ -130,11 +130,11 @@ extension SYPhotoPickerHelper {
     }
 }
 
-// MARK: - FetchPhoto
+// MARK: - Fetch Photo
 
 extension SYPhotoPickerHelper {
     
-    public func fetchPhotos() -> [AlbumFolder] {
+    func fetchPhotos() -> [AlbumFolder] {
         
         let fetchOptions = PHFetchOptions()
         fetchOptions.includeAssetSourceTypes = .typeUserLibrary
@@ -174,15 +174,15 @@ extension SYPhotoPickerHelper {
         return album
     }
     
-    /// 取得照片略酥酡
+    /// 取得照片略縮圖
     /// - Parameters:
     ///   - asset: PHAsset
     ///   - requestID: 請求識別碼
     ///   - completion: 完成後回調
     /// - Returns: PHImageRequestID
-    public func fetchThumbnail(form asset: PHAsset,
-                               requestID: Int,
-                               completion: @escaping (_ image: UIImage) -> Swift.Void) -> PHImageRequestID? {
+    func fetchThumbnail(form asset: PHAsset,
+                        requestID: Int,
+                        completion: @escaping (_ image: UIImage) -> Swift.Void) -> PHImageRequestID {
         
         requestOptions.resizeMode = .exact
         requestOptions.deliveryMode = .highQualityFormat
@@ -206,27 +206,52 @@ extension SYPhotoPickerHelper {
         return id
     }
     
-    public func startCacheImage(prefetchItemsAt assets: [PHAsset]) {
+    func startCacheImage(prefetchItemsAt assets: [PHAsset]) {
         
         requestOptions.resizeMode = .fast
         requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
         
         imageManager.startCachingImages(for: assets,
-                                           targetSize: photoThumbnailSize,
-                                           contentMode: .aspectFill,
-                                           options: requestOptions)
+                                        targetSize: photoThumbnailSize,
+                                        contentMode: .aspectFill,
+                                        options: requestOptions)
     }
     
-    public func stopCacheImage(cancelPrefetchingForItemsAt assets: [PHAsset]) {
+    func stopCacheImage(cancelPrefetchingForItemsAt assets: [PHAsset]) {
         
         requestOptions.resizeMode = .fast
         requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
         
         imageManager.stopCachingImages(for: assets,
-                                          targetSize: photoThumbnailSize,
-                                          contentMode: .aspectFill,
-                                          options: requestOptions)
+                                       targetSize: photoThumbnailSize,
+                                       contentMode: .aspectFill,
+                                       options: requestOptions)
+    }
+    
+    /// 取得圖片
+    /// - Parameters:
+    ///   - asset: PHAsset
+    ///   - size: 圖片尺寸
+    ///   - completion: 完成後回調
+    public func fetchImage(form asset: PHAsset,
+                           size: CGSize,
+                           completion: @escaping (_ image: UIImage) -> Swift.Void) {
+        
+        requestOptions.resizeMode = .fast
+        requestOptions.deliveryMode = .fastFormat
+        requestOptions.isSynchronous = false
+        
+        imageManager.requestImage(
+            for: asset,
+            targetSize: size,
+            contentMode: .aspectFit,
+            options: requestOptions,
+            resultHandler: { (result, info) in
+                guard let image = result else { return }
+            
+                completion(image)
+            })
     }
 }

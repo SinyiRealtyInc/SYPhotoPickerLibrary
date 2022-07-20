@@ -59,6 +59,6 @@ extension SYAlbumCell {
                 self?.photoImageView.image = image
         })
         
-        tag = Int(requestID ?? 0)
+        tag = Int(requestID)
     }
 }

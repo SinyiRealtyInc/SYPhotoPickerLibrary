@@ -118,16 +118,16 @@ extension SYPhotoPicker {
                      presentationStyle: UIModalPresentationStyle = .fullScreen) {
         
         SYPhotoPickerHelper.requestPermission(
-            didAuthorized: { [weak self] in
-                self?.showPhotoPicker(currentVC: currentVC,
-                                      modalPresentationStyle: presentationStyle)
+            didAuthorized: {
+                self.showPhotoPicker(currentVC: currentVC,
+                                     modalPresentationStyle: presentationStyle)
             },
-            didLimited: { [weak self] in
-                self?.showPhotoPicker(currentVC: currentVC,
-                                      modalPresentationStyle: presentationStyle)
+            didLimited: {
+                self.showPhotoPicker(currentVC: currentVC,
+                                     modalPresentationStyle: presentationStyle)
             },
-            didDenied: { [weak self] in
-                self?.delegate?.photoPickerAuthorizedDenied?()
+            didDenied: {
+                self.delegate?.photoPickerAuthorizedDenied?()
             })
     }
 }
