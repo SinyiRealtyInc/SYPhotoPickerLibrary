@@ -159,12 +159,14 @@ extension SYPhotoPickerHelper {
             guard assets.count > 0 else { continue }
             data.append((collection, assets))
         }
+        
         for i in 0 ..< albums.count {
             let collection = albums[i]
             let assets = PHAsset.fetchAssets(in: collection , options: options)
             guard assets.count > 0 else { continue }
             data.append((collection, assets))
         }
+        
         data.sort { $0.assets.count > $1.assets.count }
         
         var album = [AlbumFolder]()
@@ -234,14 +236,16 @@ extension SYPhotoPickerHelper {
     /// - Parameters:
     ///   - asset: PHAsset
     ///   - size: 圖片尺寸
+    ///   - isSynchronous: 是否要等待圖片處理完成 true = block the calling thread, otherwise false.
     ///   - completion: 完成後回調
     public func fetchImage(form asset: PHAsset,
                            size: CGSize,
+                           isSynchronous: Bool,
                            completion: @escaping (_ image: UIImage) -> Swift.Void) {
         
         requestOptions.resizeMode = .fast
-        requestOptions.deliveryMode = .fastFormat
-        requestOptions.isSynchronous = false
+        requestOptions.deliveryMode = .highQualityFormat
+        requestOptions.isSynchronous = isSynchronous
         
         imageManager.requestImage(
             for: asset,
