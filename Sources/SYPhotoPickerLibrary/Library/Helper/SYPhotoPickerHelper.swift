@@ -32,16 +32,13 @@ public class SYPhotoPickerHelper {
     
     private(set) var photoThumbnailSize: CGSize = .zero
     
-    #warning("Cache 待優化")
-    private var imageCache: NSCache<AnyObject, UIImage> = NSCache()
-    
     private init() {
         
         imageManager = PHCachingImageManager()
         imageManager.allowsCachingHighQualityImages = false
         
         requestOptions = PHImageRequestOptions()
-        requestOptions.isNetworkAccessAllowed = false
+        requestOptions.isNetworkAccessAllowed = true
         
         let density = UIScreen.main.scale
         photoThumbnailSize = CGSize(width: 100 * density, height: 100 * density)
@@ -52,9 +49,6 @@ public class SYPhotoPickerHelper {
     }
     
     deinit {
-        #warning("Cache 待優化")
-        //imageCache.removeAllObjects()
-        
         SYPhotoPickerHelper.weakInstance = nil
     }
     
@@ -236,25 +230,33 @@ extension SYPhotoPickerHelper {
     /// - Parameters:
     ///   - asset: PHAsset
     ///   - size: 圖片尺寸
+    ///   - resizeMode: PHImageRequestOptionsResizeMode
+    ///   - deliveryMode: PHImageRequestOptionsDeliveryMode
     ///   - isSynchronous: 是否要等待圖片處理完成 true = block the calling thread, otherwise false.
     ///   - completion: 完成後回調
     public func fetchImage(form asset: PHAsset,
                            size: CGSize,
-                           isSynchronous: Bool,
-                           completion: @escaping (_ image: UIImage) -> Swift.Void) {
+                           resizeMode: PHImageRequestOptionsResizeMode = .exact,
+                           deliveryMode: PHImageRequestOptionsDeliveryMode = .highQualityFormat,
+                           isSynchronous: Bool = true,
+                           completion: @escaping (_ image: UIImage?) -> Swift.Void) {
         
-        requestOptions.resizeMode = .fast
+        requestOptions.resizeMode = .exact
         requestOptions.deliveryMode = .highQualityFormat
         requestOptions.isSynchronous = isSynchronous
         
-        imageManager.requestImage(
+        PHImageManager.default().requestImage(
             for: asset,
             targetSize: size,
             contentMode: .aspectFit,
             options: requestOptions,
             resultHandler: { (result, info) in
-                guard let image = result else { return }
-            
+                
+                guard let image = result else {
+                    completion(nil)
+                    return
+                }
+                
                 completion(image)
             })
     }
