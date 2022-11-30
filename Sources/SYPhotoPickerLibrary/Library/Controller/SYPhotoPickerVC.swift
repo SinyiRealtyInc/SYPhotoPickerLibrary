@@ -7,6 +7,7 @@
 
 import UIKit
 import Photos
+import PhotosUI
 
 class SYPhotoPickerVC: UIViewController {
     
@@ -24,7 +25,7 @@ class SYPhotoPickerVC: UIViewController {
         
         button.setTitleColor(settings.barTitleIconColor, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 17)
-        button.setImage(UIImage(named: "ic-arrow-down-gray", in: .module, compatibleWith: nil),
+        button.setImage(UIImage(named: "ic-arrow-down", in: .module, compatibleWith: nil),
                         for: .normal)
         button.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: -8.0, bottom: 0.0, right: 0.0)
         button.semanticContentAttribute = .forceRightToLeft
@@ -343,6 +344,33 @@ extension SYPhotoPickerVC {
     
     /// 開啟相簿選擇清單
     @objc private func showPhotoAlbums(_ button: UIButton) {
+        guard viewModel.getAlbumFolderCount() > 0 else {
+            if #available(iOS 15, *) {
+                PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self) { [weak self] values in
+                    self?.viewModel.loadAlbums()
+                }
+            } else if #available(iOS 14, *) {
+                // 僅第一次才監聽相簿更動
+                PHPhotoLibrary.shared().register(self)
+                PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+            }
+            
+            return
+        }
+        
         viewModel.showPhotoAlbums()
+    }
+}
+
+// MARK: - PHPhotoLibraryChangeObserver
+
+extension SYPhotoPickerVC: PHPhotoLibraryChangeObserver {
+    
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        DispatchQueue.main.async {
+            self.viewModel.loadAlbums()
+        }
+        
+        PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
 }

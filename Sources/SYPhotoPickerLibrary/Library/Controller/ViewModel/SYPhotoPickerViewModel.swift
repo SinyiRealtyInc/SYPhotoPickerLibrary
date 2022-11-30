@@ -109,14 +109,9 @@ extension SYPhotoPickerViewModel {
     func showPhotoAlbums() {
         updateNavigationArrow(open: !isHiddenAlbum)
     }
-}
-
-// MARK: - Private Methods
-
-extension SYPhotoPickerViewModel {
     
     /// 載入照片
-    private func loadAlbums() {
+    func loadAlbums() {
 
         albumFolders = SYPhotoPickerHelper.shared.fetchPhotos()
         
@@ -126,6 +121,11 @@ extension SYPhotoPickerViewModel {
         delegate?.collectionViewReloadData()
         delegate?.tableViewReloadData()
     }
+}
+
+// MARK: - Private Methods
+
+extension SYPhotoPickerViewModel {
     
     /// 更新右側BarButton狀態
     private func updateBarRightItem() {

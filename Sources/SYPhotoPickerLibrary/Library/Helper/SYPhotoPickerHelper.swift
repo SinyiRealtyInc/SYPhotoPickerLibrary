@@ -78,9 +78,9 @@ extension SYPhotoPickerHelper {
     
     /// 請求相簿權限
     /// - Parameters:
-    ///   - didAuthorized: 使用者允許讀取相簿 callback
-    ///   - didLimited: 使用者允許讀取相簿但僅顯示部分照片
-    ///   - didDenied: 使用者不允許讀取相簿 callback
+    ///   - didAuthorized: 使用者允許讀取相簿回調
+    ///   - didLimited: 使用者允許讀取相簿但僅顯示部分照片回調
+    ///   - didDenied: 使用者不允許讀取相簿回調
     static public func requestPermission(didAuthorized: DidAuthorized?,
                                          didLimited: DidLimited?,
                                          didDenied: DidDenied?) {
