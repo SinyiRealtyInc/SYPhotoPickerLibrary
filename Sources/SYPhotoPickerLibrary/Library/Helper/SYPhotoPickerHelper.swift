@@ -59,8 +59,8 @@ extension SYPhotoPickerHelper {
     /// 使用者允許讀取相簿 callback
     public typealias DidAuthorized = () -> Swift.Void
     
-    /// 使用者允許讀取相簿但僅顯示部分照片 callback，firstRequest：是否第一次詢問
-    public typealias DidLimited = (_ firstRequest: Bool) -> Swift.Void
+    /// 使用者允許讀取相簿但僅顯示部分照片
+    public typealias DidLimited = () -> Swift.Void
     
     /// 使用者不允許讀取相簿 callback
     public typealias DidDenied = () -> Swift.Void
@@ -82,7 +82,7 @@ extension SYPhotoPickerHelper {
                         case .authorized:
                             didAuthorized?()
                         case .limited:
-                            didLimited?(true)
+                            didLimited?()
                         case .denied, .restricted:
                             didDenied?()
                         case .notDetermined:
@@ -96,7 +96,7 @@ extension SYPhotoPickerHelper {
             case .authorized:
                 didAuthorized?()
             case .limited:
-                didLimited?(false)
+                didLimited?()
             case .denied, .restricted:
                 didDenied?()
             default:

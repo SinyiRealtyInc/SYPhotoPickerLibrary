@@ -120,7 +120,7 @@ extension SYPhotoPicker {
                 self.showPhotoPicker(currentVC: currentVC,
                                      modalPresentationStyle: presentationStyle)
             },
-            didLimited: {
+            didLimited: { 
                 self.showPhotoPicker(currentVC: currentVC,
                                      modalPresentationStyle: presentationStyle)
             },
