@@ -50,13 +50,13 @@ class SYPhotoCell: UICollectionViewCell {
 extension SYPhotoCell {
     
     private func setupView() {
-        
         opacityView.isHidden = true
         borderView.isHidden = true
         
         pickLabel.text = nil
         pickLabel.isHidden = true
         pickLabel.layer.cornerRadius = 10
+        pickLabel.clipsToBounds = true
     }
     
     private func setData() {

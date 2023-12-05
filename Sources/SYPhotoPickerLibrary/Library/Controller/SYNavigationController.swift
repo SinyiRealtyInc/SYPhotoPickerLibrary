@@ -26,21 +26,15 @@ class SYNavigationController: UINavigationController {
         let foregroundColor: UIColor = settings.barTitleIconColor
         let backgroundColor: UIColor = settings.barTintColor
         
-        if #available(iOS 13.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithDefaultBackground()
-            appearance.backgroundColor = backgroundColor
-            appearance.titleTextAttributes = [.foregroundColor: foregroundColor]
-            
-            navigationBar.tintColor = foregroundColor
-            navigationBar.standardAppearance = appearance
-            navigationBar.scrollEdgeAppearance = appearance
-            navigationBar.isTranslucent = false
-        } else {
-            navigationBar.tintColor = foregroundColor
-            navigationBar.barTintColor = backgroundColor
-            navigationBar.isTranslucent = false
-        }
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = backgroundColor
+        appearance.titleTextAttributes = [.foregroundColor: foregroundColor]
+        
+        navigationBar.tintColor = foregroundColor
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.isTranslucent = false
         
         // 更改狀態列顏色
         setNeedsStatusBarAppearanceUpdate()

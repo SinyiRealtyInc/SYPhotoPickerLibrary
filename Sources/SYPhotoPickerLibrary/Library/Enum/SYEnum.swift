@@ -48,6 +48,9 @@ public enum SYColor {
     /// hex: 4a4a4a, rgb(74, 74, 74)
     public static let black = UIColor(red: 74 / 255, green: 74 / 255, blue: 74 / 255, alpha: 1.0)
     
+    /// hex: 001931, rgba(0, 25, 49)
+    public static let black2 = UIColor(red: 0 / 255, green: 25 / 255, blue: 49 / 255, alpha: 1.0)
+    
     /// hex: 5a5a5a, rgb(90, 90, 90)
     public static let blackLight = UIColor(red: 90 / 255, green: 90 / 255, blue: 90 / 255, alpha: 1.0)
     
@@ -62,11 +65,11 @@ public enum SYColor {
 
 public enum SYImage: String {
     
-    /// 向下箭頭(灰色)
-    case downArrow = "ic-arrow-down-gray"
+    /// 向下箭頭
+    case downArrow = "ic-arrow-down"
     
-    /// 關閉(白色)
-    case close = "ic-close-white"
+    /// 關閉
+    case close = "ic-close"
     
     /// 圖示
     public var image: UIImage? {

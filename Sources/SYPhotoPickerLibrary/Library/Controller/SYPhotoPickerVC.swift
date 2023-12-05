@@ -81,9 +81,7 @@ extension SYPhotoPickerVC {
     
     private func setup() {
         // 目前無支援深色模式，直接強制亮色模式
-        if #available(iOS 13.0, *) {
-            overrideUserInterfaceStyle = .light
-        }
+        overrideUserInterfaceStyle = .light
         
         navigationItem.leftBarButtonItem = barLeftItem
         navigationItem.rightBarButtonItem = barRightItem

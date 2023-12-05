@@ -112,8 +112,7 @@ extension SYPhotoPickerViewModel {
     
     /// 載入照片
     func loadAlbums() {
-
-        albumFolders = SYPhotoPickerHelper.shared.fetchPhotos()
+        albumFolders = SYPhotoPickerHelper.shared.fetchPhotos(fetchLimit: settings.photoFeatchCount)
         
         guard albumFolders.count > 0 else { return }
         
@@ -258,8 +257,10 @@ extension SYPhotoPickerViewModel {
     /// 挑選照片
     /// - Parameter indexPath: 索引
     func collectionViewDidSelect(indexPath: IndexPath) {
-        
-        guard albumFolders.count > 0 else { return }
+        guard albumFolders.isEmpty == false
+        else {
+            return
+        }
         
         let row = indexPath.row
         let assets = albumFolders[albumSelectIndex].assets

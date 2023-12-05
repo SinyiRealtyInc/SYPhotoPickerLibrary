@@ -33,7 +33,6 @@ public class SYPhotoPickerHelper {
     private(set) var photoThumbnailSize: CGSize = .zero
     
     private init() {
-        
         imageManager = PHCachingImageManager()
         imageManager.allowsCachingHighQualityImages = false
         
@@ -51,15 +50,6 @@ public class SYPhotoPickerHelper {
     deinit {
         SYPhotoPickerHelper.weakInstance = nil
     }
-    
-    /// 設定略縮圖的大小
-    /// - Parameter value: 大小, 上限 = 100
-    func setupPhotoThumbnailSize(value: CGFloat) {
-        
-        let density = UIScreen.main.scale
-        let result = min(abs(value), 100)
-        photoThumbnailSize = CGSize(width: result * density, height: result * density)
-    }
 }
 
 // MARK: - AuthorizationStatus
@@ -69,9 +59,8 @@ extension SYPhotoPickerHelper {
     /// 使用者允許讀取相簿 callback
     public typealias DidAuthorized = () -> Swift.Void
     
-    
-    /// 使用者允許讀取相簿但僅顯示部分照片
-    public typealias DidLimited = () -> Swift.Void
+    /// 使用者允許讀取相簿但僅顯示部分照片 callback，firstRequest：是否第一次詢問
+    public typealias DidLimited = (_ firstRequest: Bool) -> Swift.Void
     
     /// 使用者不允許讀取相簿 callback
     public typealias DidDenied = () -> Swift.Void
@@ -84,41 +73,56 @@ extension SYPhotoPickerHelper {
     static public func requestPermission(didAuthorized: DidAuthorized?,
                                          didLimited: DidLimited?,
                                          didDenied: DidDenied?) {
-        let status = PHPhotoLibrary.authorizationStatus()
-        
-        switch status {
-        case .restricted, .denied:
-            didDenied?()
-            return
-        case .authorized:
-            didAuthorized?()
-            return
-        default:
-            break
-        }
-        
-        if #available(iOS 14, *) {
-            switch status {
+        if #available(iOS 14.0, *) {
+            switch PHPhotoLibrary.authorizationStatus() {
             case .notDetermined:
-                PHPhotoLibrary.requestAuthorization(for: .readWrite) { _ in
+                PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
                     DispatchQueue.main.async {
-                        requestPermission(didAuthorized: didAuthorized,
-                                          didLimited: didLimited,
-                                          didDenied: didDenied)
+                        switch status {
+                        case .authorized:
+                            didAuthorized?()
+                        case .limited:
+                            didLimited?(true)
+                        case .denied, .restricted:
+                            didDenied?()
+                        case .notDetermined:
+                            // do nothing...
+                            break
+                        @unknown default:
+                            break
+                        }
                     }
                 }
+            case .authorized:
+                didAuthorized?()
             case .limited:
-                didLimited?()
+                didLimited?(false)
+            case .denied, .restricted:
+                didDenied?()
             default:
                 break
             }
         } else {
-            PHPhotoLibrary.requestAuthorization { _ in
-                DispatchQueue.main.async {
-                    requestPermission(didAuthorized: didAuthorized,
-                                      didLimited: didLimited,
-                                      didDenied: didDenied)
+            switch PHPhotoLibrary.authorizationStatus() {
+            case .notDetermined:
+                PHPhotoLibrary.requestAuthorization { (status) in
+                    DispatchQueue.main.async {
+                        switch status {
+                        case .authorized:
+                            didAuthorized?()
+                        case .denied, .restricted:
+                            didDenied?()
+                        default:
+                            break
+                        }
+                    }
                 }
+            case .authorized:
+                didAuthorized?()
+            case .denied, .restricted:
+                didDenied?()
+            default:
+                break
             }
         }
     }
@@ -128,39 +132,40 @@ extension SYPhotoPickerHelper {
 
 extension SYPhotoPickerHelper {
     
-    func fetchPhotos() -> [AlbumFolder] {
+    /// 取得相簿
+    /// - Parameter fetchLimit: 相簿內取得張數
+    /// - Returns: [AlbumFolder]
+    func fetchPhotos(fetchLimit: Int) -> [AlbumFolder] {
         
         let fetchOptions = PHFetchOptions()
         fetchOptions.includeAssetSourceTypes = .typeUserLibrary
-        
-        // Smart album
-        let smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum,
-                                                                  subtype: .albumRegular,
-                                                                  options: fetchOptions)
-        // DropBox、Instagram ... else
-        let albums = PHAssetCollection.fetchAssetCollections(with: .album,
-                                                             subtype: .albumRegular,
-                                                             options: fetchOptions)
-        
-        var data: [(collection: PHAssetCollection, assets: PHFetchResult<PHAsset>)] = []
+
         let options = PHFetchOptions()
         options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        
-        for i in 0 ..< smartAlbums.count {
-            let collection = smartAlbums[i]
-            let assets = PHAsset.fetchAssets(in: collection , options: options)
-            guard assets.count > 0 else { continue }
-            data.append((collection, assets))
+        options.fetchLimit = fetchLimit < 1 ? 9999 : fetchLimit
+
+        let albums = [
+            PHAssetCollection.fetchAssetCollections(with: .smartAlbum,
+                                                    subtype: .albumRegular,
+                                                    options: fetchOptions),
+            PHAssetCollection.fetchAssetCollections(with: .album,
+                                                    subtype: .albumRegular,
+                                                    options: fetchOptions)
+        ]
+
+        var data: [(collection: PHAssetCollection, assets: PHFetchResult<PHAsset>)] = []
+
+        for album in albums {
+            for i in 0 ..< album.count {
+                let collection = album[i]
+                let assets = PHAsset.fetchAssets(in: collection , options: options)
+                if assets.count > 0 {
+                    data.append((collection, assets))
+                }
+            }
         }
-        
-        for i in 0 ..< albums.count {
-            let collection = albums[i]
-            let assets = PHAsset.fetchAssets(in: collection , options: options)
-            guard assets.count > 0 else { continue }
-            data.append((collection, assets))
-        }
-        
+
         data.sort { $0.assets.count > $1.assets.count }
         
         var album = [AlbumFolder]()
@@ -203,7 +208,6 @@ extension SYPhotoPickerHelper {
     }
     
     func startCacheImage(prefetchItemsAt assets: [PHAsset]) {
-        
         requestOptions.resizeMode = .fast
         requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
@@ -215,7 +219,6 @@ extension SYPhotoPickerHelper {
     }
     
     func stopCacheImage(cancelPrefetchingForItemsAt assets: [PHAsset]) {
-        
         requestOptions.resizeMode = .fast
         requestOptions.deliveryMode = .fastFormat
         requestOptions.isSynchronous = false
@@ -259,5 +262,33 @@ extension SYPhotoPickerHelper {
                 
                 completion(image)
             })
+    }
+}
+
+// MARK: - Function
+
+extension SYPhotoPickerHelper {
+    
+    /// 設定略縮圖的大小
+    /// - Parameter value: 大小, 上限 = 100
+    func setupPhotoThumbnailSize(value: CGFloat) {
+        
+        let density = UIScreen.main.scale
+        let result = max(abs(value), 100)
+        photoThumbnailSize = CGSize(width: result * density, height: result * density)
+    }
+    
+    /// 取得檔名
+    /// - Parameter asset: PHAsset
+    /// - Returns: 檔名
+    public func fetchImageName(from asset: PHAsset) -> String? {
+        return PHAssetResource.assetResources(for: asset).first?.originalFilename
+    }
+    
+    /// 取得檔案類型
+    /// - Parameter asset: PHAsset
+    /// - Returns: 檔案類型
+    public func fetchImageUTI(from asset: PHAsset) -> String? {
+        return PHAssetResource.assetResources(for: asset).first?.uniformTypeIdentifier
     }
 }

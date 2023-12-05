@@ -60,10 +60,9 @@ extension SYPhotoPicker {
     }
     
     private func setupTaSetting() {
-        
-        settings.statusBarStyle = .lightContent
-        settings.barTintColor = SYColor.green
-        settings.barTitleIconColor = .white
+        settings.statusBarStyle = .darkContent
+        settings.barTintColor = .white
+        settings.barTitleIconColor = SYColor.black2
         settings.leftBarTitle = nil
         settings.rightBarTitle = "確認"
         settings.leftBarImage = SYImage.close.image
@@ -76,7 +75,6 @@ extension SYPhotoPicker {
     }
     
     private func setupImSetting() {
-        
         settings.statusBarStyle = .default
         settings.barTintColor = .white
         settings.barTitleIconColor = SYColor.black
@@ -86,7 +84,7 @@ extension SYPhotoPicker {
         settings.rightBarImage = nil
         settings.limitCount = 10
         settings.numberForRow = 4
-        settings.photoSelectStyle = .checkbox
+        settings.photoSelectStyle = .number
         settings.photoSelectBorderWidth = 0
         settings.photoSelectColor = SYColor.green
     }

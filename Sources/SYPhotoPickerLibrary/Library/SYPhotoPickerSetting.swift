@@ -48,6 +48,9 @@ public protocol PhotoPickerSetting {
     /// 照片選取顏色
     var photoSelectColor: UIColor { get set }
     
+    /// 各相簿取得照片張數
+    var photoFeatchCount: Int { get set}
+    
     /// 已選取的照片
     var selectedPhotos: [PHAsset] { get set }
 }
@@ -66,5 +69,6 @@ public struct SYPhotoPickerSetting: PhotoPickerSetting {
     public var photoSelectStyle: SYPhotoSelectSytle = .number
     public var photoSelectBorderWidth: CGFloat = 2
     public var photoSelectColor: UIColor = .systemOrange
+    public var photoFeatchCount: Int = 9999
     public var selectedPhotos: [PHAsset] = []
 }
