@@ -110,12 +110,12 @@ extension SYPhotoPickerVC {
         collectionView.collectionViewLayout = layout
         collectionView.register(UINib(nibName: "SYPhotoCell", bundle: .module),
                                 forCellWithReuseIdentifier: "SYPhotoCell")
+        collectionView.backgroundColor = .white
         
         SYPhotoPickerHelper.shared.setupPhotoThumbnailSize(value: width)
     }
     
     private func setupTabelView() {
-        
         tableViewHeight.constant = 0
         
         tableContainerView.layer.shadowColor = UIColor.black.cgColor
@@ -125,6 +125,7 @@ extension SYPhotoPickerVC {
         
         tableView.register(UINib(nibName: "SYAlbumCell", bundle: .module),
                            forCellReuseIdentifier: "SYAlbumCell")
+        tableView.backgroundColor = .white
     }
 }
 

@@ -35,12 +35,14 @@ class SYAlbumCell: UITableViewCell {
 extension SYAlbumCell {
     
     private func setupView() {
-        
         titleLabel.font = .boldSystemFont(ofSize: 17)
         countLabel.font = .systemFont(ofSize: 13)
         
         titleLabel.textColor = .black
         countLabel.textColor = SYColor.blackLight
+        
+        backgroundColor = .white
+        contentView.backgroundColor = .white
     }
     
     private func setData() {

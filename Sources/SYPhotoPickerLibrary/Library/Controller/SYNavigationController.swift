@@ -17,7 +17,7 @@ class SYNavigationController: UINavigationController {
         super.viewDidLoad()
         
         // 目前無支援深色模式，直接強制亮色模式
-        overrideUserInterfaceStyle = .light
+        overrideUserInterfaceStyle = .dark
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
