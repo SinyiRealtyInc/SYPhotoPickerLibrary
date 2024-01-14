@@ -4,8 +4,8 @@ It's the photo picker library for Sinyi Realty Inc use.
 
 ## Requirements and Details
 
-- iOS 10.0+
-- Xcode 13.2.1+
+- iOS 13.0+
+- Xcode 15.0+
 - Build with Swift 5.0+
 
 ## Installation
@@ -18,7 +18,7 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary", .upToNextMajor(from: "1.0.9"))
 ]
 ```
 
@@ -117,7 +117,7 @@ SYPhotoPickerLibrary is available under the MIT license. See the [LICENSE](LICEN
 
     MIT License
 
-    Copyright (c) [2022] [Sinyi Realty Inc]
+    Copyright (c) [2024] [Sinyi Realty Inc]
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

@@ -80,9 +80,6 @@ class SYPhotoPickerVC: UIViewController {
 extension SYPhotoPickerVC {
     
     private func setup() {
-        // 目前無支援深色模式，直接強制亮色模式
-        overrideUserInterfaceStyle = .light
-        
         navigationItem.leftBarButtonItem = barLeftItem
         navigationItem.rightBarButtonItem = barRightItem
         navigationItem.titleView = barTitleButton
