@@ -18,7 +18,7 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary", .upToNextMajor(from: "1.0.9"))
+    .package(url: "https://github.com/SinyiRealtyInc/SYPhotoPickerLibrary", .upToNextMajor(from: "2.0.0"))
 ]
 ```
 
