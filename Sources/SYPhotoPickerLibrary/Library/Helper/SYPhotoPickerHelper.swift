@@ -146,8 +146,14 @@ extension SYPhotoPickerHelper {
         options.fetchLimit = fetchLimit < 1 ? 9999 : fetchLimit
 
         let albums = [
+            // smartAlbumUserLibrary: 所有照片（相機膠卷）
+            // smartAlbumScreenshots: 截圖
+            // album + albumRegular: 用戶自定的相簿
             PHAssetCollection.fetchAssetCollections(with: .smartAlbum,
-                                                    subtype: .albumRegular,
+                                                    subtype: .smartAlbumUserLibrary,
+                                                    options: fetchOptions),
+            PHAssetCollection.fetchAssetCollections(with: .smartAlbum,
+                                                    subtype: .smartAlbumScreenshots,
                                                     options: fetchOptions),
             PHAssetCollection.fetchAssetCollections(with: .album,
                                                     subtype: .albumRegular,
